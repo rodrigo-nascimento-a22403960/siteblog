@@ -1,0 +1,39 @@
+/* src/components/ScrollStack.css */
+.scroll-stack-scroller {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  will-change: scroll-position;
+}
+
+.scroll-stack-inner {
+  /* Mais padding no topo e no fundo para um scroll mais suave */
+  padding: 15vh 2rem 30vh; 
+  max-width: 1000px; /* Um pouco mais largo */
+  margin: 0 auto;
+}
+
+.scroll-stack-card {
+  transform-origin: top center;
+  will-change: transform, filter, opacity; /* Adicionado opacity */
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  min-height: 500px; /* Cartões mais altos */
+  width: 100%;
+  /* Margem grande para garantir espaço se o JS não carregar */
+  margin-bottom: 40vh; 
+  box-sizing: border-box;
+  position: relative;
+  /* Sombra suave para destacar do fundo */
+  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
+}
+
+.scroll-stack-end {
+  width: 100%;
+  height: 1px;
+}

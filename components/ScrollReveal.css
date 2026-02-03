@@ -1,0 +1,17 @@
+.scroll-reveal {
+  margin: 20px 0;
+  position: relative;
+}
+
+.scroll-reveal-text {
+  /* O original tinha clamp(1.6rem...) que é gigante. 
+     Vamos deixar 'inherit' para controlares o tamanho via Tailwind no pai */
+  font-size: inherit; 
+  line-height: 1.6;
+  font-weight: inherit;
+}
+
+.word {
+  display: inline-block;
+  white-space: pre-wrap; /* Garante que os espaços são respeitados */
+}
