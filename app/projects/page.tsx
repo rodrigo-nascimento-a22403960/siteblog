@@ -4,44 +4,55 @@ import CardStack from '@/components/CardStack';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 
-// DADOS DOS PROJETOS
 const projects = [
   {
-    title: "Portfolio V1",
-    description: "A minha casa digital. Um site focado em performance, interações fluidas e uma identidade visual forte, construído com as tecnologias mais modernas do ecossistema React.",
-    tags: ['Next.js 14', 'TypeScript', 'Framer Motion', 'Tailwind'],
-    color: "from-green-500 to-emerald-900", // Cor do fundo
+    title: "Gravity Connect 4",
+    // Baseado no CV
+    description: "A 'Connect 4' game developed in Kotlin featuring a custom mechanic where pieces enter from below the board, simulating inverted gravity. Focused on creative logic and unique user experience.",
+    tags: ['Kotlin', 'Game Logic', 'UI/UX', 'Algorithms'],
+    color: "from-purple-600 to-blue-900",
     visual: (
-       // O que aparece na "imagem" do cartão
-       <div className="text-[100px] font-bold text-white/5 tracking-tighter">V1</div>
+       <div className="text-[80px] font-bold text-white/5 tracking-tighter">KOTLIN</div>
     )
   },
   {
-    title: "Neural Net Classifier",
-    description: "Modelo de Deep Learning para classificação de imagens. Treinado com um dataset personalizado de 50.000 imagens, atingindo 98.5% de precisão em testes.",
-    tags: ['Python', 'TensorFlow', 'Keras', 'Docker'],
-    color: "from-purple-500 to-indigo-900",
+    title: "Naval Radar System",
+    // Baseado no CV
+    description: "Boat radar game developed in C. Low-level implementation focused on memory management, vector positioning, and real-time radar-style feedback logic.",
+    tags: ['C Language', 'Low-level', 'Memory Mgmt', 'Vectors'],
+    color: "from-emerald-600 to-green-900",
     visual: (
-       <div className="text-[100px] font-bold text-white/5 tracking-tighter">AI</div>
+       <div className="text-[80px] font-bold text-white/5 tracking-tighter">C-LANG</div>
     )
   },
   {
-    title: "Sync Task Manager",
-    description: "Aplicação móvel multiplataforma para gestão de produtividade. Sincronização em tempo real, modo offline e uma interface de utilizador premiada.",
-    tags: ['Flutter', 'Firebase', 'Dart', 'iOS/Android'],
-    color: "from-blue-500 to-cyan-900",
+    title: "Strategic Board Engine",
+    // Baseado no CV
+    description: "Complete board game engine built in Java. Features robust Object-Oriented architecture, complex turn management, event mechanics, and strict rule encapsulation.",
+    tags: ['Java', 'OOP', 'Design Patterns', 'System Arch'],
+    color: "from-orange-600 to-red-900",
     visual: (
-       <div className="text-[100px] font-bold text-white/5 tracking-tighter">APP</div>
+       <div className="text-[80px] font-bold text-white/5 tracking-tighter">JAVA</div>
     )
   },
   {
-    title: "Vamos trabalhar?",
-    description: "Se tens um projeto interessante ou queres apenas dizer olá, envia-me uma mensagem.",
+    title: "AI & IoT Systems",
+    // Baseado no CV
+    description: "Development of AI-powered website assistants for information retrieval and a Smart Parking System integrating sensor automation workflows.",
+    tags: ['Python', 'AI / LLMs', 'IoT', 'Automation'],
+    color: "from-cyan-600 to-blue-900",
+    visual: (
+       <div className="text-[80px] font-bold text-white/5 tracking-tighter">AI+IoT</div>
+    )
+  },
+  {
+    title: "Let's work together?",
+    description: "I'm ready to bring this technical versatility (Java, Kotlin, C, Web) to your next big project.",
     tags: ['Contact', 'Email', 'LinkedIn'],
     color: "from-white to-gray-500",
     visual: (
        <Link href="/contact" className="px-8 py-4 bg-white text-black rounded-full font-bold flex items-center gap-2 hover:scale-105 transition-transform">
-          FALE COMIGO <ArrowUpRight />
+          CONTACT ME <ArrowUpRight />
        </Link>
     )
   }
@@ -50,20 +61,16 @@ const projects = [
 export default function Projects() {
   return (
     <main className="bg-[#050505] min-h-screen text-white relative">
-        
-      {/* Título da Página */}
       <div className="pt-32 px-4 text-center mb-10">
          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-4">
-            PROJETOS <span className="text-[#7cff67]">SELECIONADOS</span>
+            ACADEMIC <span className="text-[#7cff67]">PROJECTS</span>
          </h1>
-         <p className="text-gray-400">Role para baixo para explorar o arquivo</p>
+         <p className="text-gray-400">Engineering, Algorithms, and Creative Development</p>
       </div>
 
-      {/* O Componente da Pilha */}
-      <div className="pb-[50vh]"> {/* Padding no fundo para dar espaço ao último card */}
+      <div className="pb-[50vh]"> 
         <CardStack items={projects} />
       </div>
-
     </main>
   );
 }

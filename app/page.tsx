@@ -1,85 +1,107 @@
-import Aurora from '@/components/Aurora';
-import DecryptedText from '@/components/DecryptedText';
+"use client";
+
 import Link from 'next/link';
-// Ícones opcionais, se não tiveres instalado o lucide-react, avisa-me que eu removo.
+import { motion, Variants } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import Aurora from '@/components/Aurora'; // IMPORTAR O NOVO COMPONENTE
 
 export default function Home() {
+  const [shouldAnimate, setShouldAnimate] = useState(true);
+
+  useEffect(() => {
+    const visited = sessionStorage.getItem('hasVisitedHome');
+    if (visited) {
+      setShouldAnimate(false);
+    } else {
+      sessionStorage.setItem('hasVisitedHome', 'true');
+      setShouldAnimate(true);
+    }
+  }, []);
+
+  const titleVariants: Variants = {
+    hidden: { opacity: 0, y: 100, filter: 'blur(20px)' },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      filter: 'blur(0px)',
+      transition: { duration: 1, ease: [0.22, 1, 0.36, 1] } 
+    }
+  };
+
+  const subtitleVariants: Variants = {
+    hidden: { opacity: 0, letterSpacing: '0em' },
+    visible: { 
+      opacity: 1, 
+      letterSpacing: '0.2em',
+      transition: { duration: 1.5, delay: 0.5, ease: "easeOut" } 
+    }
+  };
+
+  const buttonVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { duration: 0.8, delay: 1 } 
+    }
+  };
+
   return (
-    <main className="relative w-full h-screen bg-black overflow-hidden font-sans">
+    <main className="flex min-h-screen flex-col items-center justify-center p-8 md:p-24 overflow-hidden relative bg-black">
       
-      {/* 1. O Background Aurora */}
+      {/* --- NOVO EFEITO AURORA --- */}
+      {/* Substitui as bolas antigas por isto */}
       <div className="absolute inset-0 z-0">
-        <Aurora
-          colorStops={["#7cff67", "#B19EEF", "#5227FF"]}
-          blend={0.5}
-          amplitude={1.0}
+        <Aurora 
+          colorStops={["#7cff67", "#5227FF", "#000000"]} // Verde, Roxo e Preto
+          blend={0.7}
+          amplitude={1.2}
           speed={0.5}
         />
       </div>
 
-      {/* 2. Conteúdo Central (Hero Section) */}
-      <div className="relative z-10 flex h-full w-full flex-col items-center justify-center px-4">
-         <div className="text-center space-y-8"> {/* Aumentei o space-y para dar ar */}
-             
-             {/* SEU NOME */}
-             <div className="text-white text-6xl md:text-8xl font-extrabold tracking-tighter drop-shadow-lg">
-                <DecryptedText
-                  text="Rodrigo Nascimento"
-                  animateOn="view"
-                  revealDirection="center"
-                  speed={100}
-                  maxIterations={20}
-                  characters="ABCD1234!?"
-                  className="revealed"
-                  parentClassName="all-letters"
-                  encryptedClassName="text-gray-400"
-                />
-             </div>
+      <div className="z-10 flex flex-col items-center text-center relative pointer-events-none"> 
+        {/* Adicionei pointer-events-none ao container de texto, mas pointer-events-auto nos botoes */}
+        
+        <motion.h1 
+          className="text-6xl md:text-9xl font-bold tracking-tighter text-white mb-6"
+          initial={shouldAnimate ? "hidden" : "visible"}
+          animate="visible"
+          variants={titleVariants}
+        >
+          Rodrigo Nascimento
+        </motion.h1>
 
-             {/* CARGO */}
-             <div className="text-xl md:text-2xl font-mono tracking-[0.2em] uppercase text-white/80">
-                <DecryptedText
-                  text="Computer Engineer"
-                  animateOn="view"
-                  revealDirection="start"
-                  speed={50}
-                  maxIterations={15}
-                  characters="01010101"
-                  className="text-green-400 font-bold"
-                  encryptedClassName="text-white/30"
-                />
-             </div>
+        <motion.p 
+          className="text-[#7cff67] font-mono text-sm md:text-xl font-bold uppercase mb-12"
+          initial={shouldAnimate ? "hidden" : "visible"}
+          animate="visible"
+          variants={subtitleVariants}
+        >
+          Computer Engineer
+        </motion.p>
 
-             {/* 3. OS BOTÕES (Novidade) */}
-             <div className="flex flex-col sm:flex-row gap-6 mt-12 justify-center items-center animate-fade-in-up">
-                
-                {/* Botão 1: Principal (Ver Projetos) */}
-                <Link 
-                  href="/projects" 
-                  className="group relative px-8 py-3 bg-white text-black font-bold tracking-widest uppercase text-sm hover:bg-[#7cff67] transition-all duration-300 transform hover:scale-105"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    Ver Projetos
-                    {/* Seta simples feita com texto se não quiseres ícones: -> */}
-                    <span>→</span> 
-                  </span>
-                </Link>
-
-                {/* Botão 2: Secundário (Contactar) */}
-                <Link 
-                  href="/contact" 
-                  className="group px-8 py-3 border border-white/30 text-white font-bold tracking-widest uppercase text-sm hover:bg-white/10 hover:border-white transition-all duration-300"
-                >
-                  <span className="flex items-center gap-2">
-                    Contactar
-                  </span>
-                </Link>
-
-             </div>
-
-         </div>
+        <motion.div 
+          className="flex gap-6 pointer-events-auto" // IMPORTANTE: pointer-events-auto para os botões funcionarem
+          initial={shouldAnimate ? "hidden" : "visible"}
+          animate="visible"
+          variants={buttonVariants}
+        >
+          <Link 
+            href="/projects" 
+            className="px-8 py-4 bg-white text-black font-bold text-sm tracking-widest hover:bg-[#7cff67] transition-colors duration-300"
+          >
+            VIEW PROJECTS →
+          </Link>
+          
+          <Link 
+            href="/contact" 
+            className="px-8 py-4 border border-white/20 text-white font-bold text-sm tracking-widest hover:bg-white hover:text-black transition-colors duration-300"
+          >
+            CONTACT
+          </Link>
+        </motion.div>
       </div>
-      
     </main>
   );
 }
