@@ -1,326 +1,131 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback, useMemo, useState } from 'react';
-import './ProfileCard.css';
+import React, { useRef } from "react";
+import Image from "next/image";
+import { ArrowUpRight, Github, Linkedin } from "lucide-react";
+import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
 
-const DEFAULT_INNER_GRADIENT = 'linear-gradient(145deg,#60496e8c 0%,#71C4FF44 100%)';
-
-const ANIMATION_CONFIG = {
-  INITIAL_DURATION: 1200,
-  INITIAL_X_OFFSET: 70,
-  INITIAL_Y_OFFSET: 60,
-  DEVICE_BETA_OFFSET: 20,
-  ENTER_TRANSITION_MS: 180
-};
-
-// Types
 interface ProfileCardProps {
-  avatarUrl?: string;
-  iconUrl?: string;
-  grainUrl?: string;
-  innerGradient?: string;
-  behindGlowEnabled?: boolean;
-  behindGlowColor?: string;
-  behindGlowSize?: string;
-  className?: string;
-  enableTilt?: boolean;
-  enableMobileTilt?: boolean;
-  mobileTiltSensitivity?: number;
-  miniAvatarUrl?: string;
-  name?: string;
-  title?: string;
-  handle?: string;
+  name: string;
+  title?: string; // Tornar opcional, já que não vamos usar visualmente
+  handle?: string; // Tornar opcional
+  avatarUrl: string;
   status?: string;
   contactText?: string;
-  showUserInfo?: boolean;
   onContactClick?: () => void;
+  enableTilt?: boolean;
+  behindGlowColor?: string;
 }
 
-// Helpers
-const clamp = (v: number, min = 0, max = 100) => Math.min(Math.max(v, min), max);
-const round = (v: number, precision = 3) => parseFloat(v.toFixed(precision));
-const adjust = (v: number, fMin: number, fMax: number, tMin: number, tMax: number) => 
-  round(tMin + ((tMax - tMin) * (v - fMin)) / (fMax - fMin));
-
-const ProfileCard = ({
-  avatarUrl = '/images/me.jpg',
-  iconUrl, // Optional texture
-  grainUrl, // Optional texture
-  innerGradient,
-  behindGlowEnabled = true,
-  behindGlowColor,
-  behindGlowSize,
-  className = '',
+export default function ProfileCard({
+  name,
+  avatarUrl,
+  status = "Available",
+  contactText = "Let's Talk",
+  onContactClick,
   enableTilt = true,
-  enableMobileTilt = false,
-  mobileTiltSensitivity = 5,
-  miniAvatarUrl,
-  name = 'Rodrigo',
-  title = 'Engineer',
-  handle = 'rodrigo.dev',
-  status = 'Online',
-  contactText = 'Contact',
-  showUserInfo = true,
-  onContactClick
-}: ProfileCardProps) => {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const shellRef = useRef<HTMLDivElement>(null);
-  const enterTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const leaveRafRef = useRef<number | null>(null);
+  behindGlowColor = "#7cff67",
+}: ProfileCardProps) {
+  const ref = useRef<HTMLDivElement>(null);
 
-  const tiltEngine = useMemo(() => {
-    if (!enableTilt) return null;
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const xSpring = useSpring(x, { stiffness: 300, damping: 30 });
+  const ySpring = useSpring(y, { stiffness: 300, damping: 30 });
+  const transform = useMotionTemplate`rotateX(${xSpring}deg) rotateY(${ySpring}deg)`;
 
-    let rafId: number | null = null;
-    let running = false;
-    let lastTs = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let targetX = 0;
-    let targetY = 0;
-    const DEFAULT_TAU = 0.14;
-    const INITIAL_TAU = 0.6;
-    let initialUntil = 0;
-
-    const setVarsFromXY = (x: number, y: number) => {
-      const shell = shellRef.current;
-      const wrap = wrapRef.current;
-      if (!shell || !wrap) return;
-
-      const width = shell.clientWidth || 1;
-      const height = shell.clientHeight || 1;
-      const percentX = clamp((100 / width) * x);
-      const percentY = clamp((100 / height) * y);
-      const centerX = percentX - 50;
-      const centerY = percentY - 50;
-
-      const properties: Record<string, string> = {
-        '--pointer-x': `${percentX}%`,
-        '--pointer-y': `${percentY}%`,
-        '--background-x': `${adjust(percentX, 0, 100, 35, 65)}%`,
-        '--background-y': `${adjust(percentY, 0, 100, 35, 65)}%`,
-        '--pointer-from-center': `${clamp(Math.hypot(percentY - 50, percentX - 50) / 50, 0, 1)}`,
-        '--pointer-from-top': `${percentY / 100}`,
-        '--pointer-from-left': `${percentX / 100}`,
-        '--rotate-x': `${round(-(centerX / 5))}deg`,
-        '--rotate-y': `${round(centerY / 4)}deg`
-      };
-
-      for (const [k, v] of Object.entries(properties)) {
-        wrap.style.setProperty(k, v);
-      }
-    };
-
-    const step = (ts: number) => {
-      if (!running) return;
-      if (lastTs === 0) lastTs = ts;
-      const dt = (ts - lastTs) / 1000;
-      lastTs = ts;
-
-      const tau = ts < initialUntil ? INITIAL_TAU : DEFAULT_TAU;
-      const k = 1 - Math.exp(-dt / tau);
-
-      currentX += (targetX - currentX) * k;
-      currentY += (targetY - currentY) * k;
-
-      setVarsFromXY(currentX, currentY);
-
-      const stillFar = Math.abs(targetX - currentX) > 0.05 || Math.abs(targetY - currentY) > 0.05;
-
-      if (stillFar || document.hasFocus()) {
-        rafId = requestAnimationFrame(step);
-      } else {
-        running = false;
-        lastTs = 0;
-        if (rafId) {
-          cancelAnimationFrame(rafId);
-          rafId = null;
-        }
-      }
-    };
-
-    const start = () => {
-      if (running) return;
-      running = true;
-      lastTs = 0;
-      rafId = requestAnimationFrame(step);
-    };
-
-    return {
-      setImmediate(x: number, y: number) {
-        currentX = x;
-        currentY = y;
-        setVarsFromXY(currentX, currentY);
-      },
-      setTarget(x: number, y: number) {
-        targetX = x;
-        targetY = y;
-        start();
-      },
-      toCenter() {
-        const shell = shellRef.current;
-        if (!shell) return;
-        this.setTarget(shell.clientWidth / 2, shell.clientHeight / 2);
-      },
-      beginInitial(durationMs: number) {
-        initialUntil = performance.now() + durationMs;
-        start();
-      },
-      getCurrent() {
-        return { x: currentX, y: currentY, tx: targetX, ty: targetY };
-      },
-      cancel() {
-        if (rafId) cancelAnimationFrame(rafId);
-        rafId = null;
-        running = false;
-        lastTs = 0;
-      }
-    };
-  }, [enableTilt]);
-
-  const getOffsets = (evt: any, el: HTMLElement) => {
-    const rect = el.getBoundingClientRect();
-    const clientX = evt.clientX ?? (evt.touches ? evt.touches[0].clientX : 0);
-    const clientY = evt.clientY ?? (evt.touches ? evt.touches[0].clientY : 0);
-    return { x: clientX - rect.left, y: clientY - rect.top };
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current || !enableTilt) return;
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = (e.clientX - rect.left) * 1.5;
+    const mouseY = (e.clientY - rect.top) * 1.5;
+    const rX = (mouseY / height - 0.5) * 10 * -1;
+    const rY = (mouseX / width - 0.5) * 10;
+    x.set(rX);
+    y.set(rY);
   };
 
-  const handlePointerMove = useCallback(
-    (event: any) => {
-      const shell = shellRef.current;
-      if (!shell || !tiltEngine) return;
-      const { x, y } = getOffsets(event, shell);
-      tiltEngine.setTarget(x, y);
-    },
-    [tiltEngine]
-  );
-
-  const handlePointerEnter = useCallback(
-    (event: any) => {
-      const shell = shellRef.current;
-      if (!shell || !tiltEngine) return;
-      shell.classList.add('active');
-      shell.classList.add('entering');
-      if (enterTimerRef.current) clearTimeout(enterTimerRef.current);
-      enterTimerRef.current = setTimeout(() => {
-        shell.classList.remove('entering');
-      }, ANIMATION_CONFIG.ENTER_TRANSITION_MS);
-      const { x, y } = getOffsets(event, shell);
-      tiltEngine.setTarget(x, y);
-    },
-    [tiltEngine]
-  );
-
-  const handlePointerLeave = useCallback(() => {
-    const shell = shellRef.current;
-    if (!shell || !tiltEngine) return;
-    tiltEngine.toCenter();
-    const checkSettle = () => {
-      const { x, y, tx, ty } = tiltEngine.getCurrent();
-      const settled = Math.hypot(tx - x, ty - y) < 0.6;
-      if (settled) {
-        shell.classList.remove('active');
-        leaveRafRef.current = null;
-      } else {
-        leaveRafRef.current = requestAnimationFrame(checkSettle);
-      }
-    };
-    if (leaveRafRef.current) cancelAnimationFrame(leaveRafRef.current);
-    leaveRafRef.current = requestAnimationFrame(checkSettle);
-  }, [tiltEngine]);
-
-  useEffect(() => {
-    if (!enableTilt || !tiltEngine) return;
-    const shell = shellRef.current;
-    if (!shell) return;
-
-    shell.addEventListener('pointerenter', handlePointerEnter);
-    shell.addEventListener('pointermove', handlePointerMove);
-    shell.addEventListener('pointerleave', handlePointerLeave);
-
-    const initialX = (shell.clientWidth || 0) - ANIMATION_CONFIG.INITIAL_X_OFFSET;
-    const initialY = ANIMATION_CONFIG.INITIAL_Y_OFFSET;
-    tiltEngine.setImmediate(initialX, initialY);
-    tiltEngine.toCenter();
-    tiltEngine.beginInitial(ANIMATION_CONFIG.INITIAL_DURATION);
-
-    return () => {
-      shell.removeEventListener('pointerenter', handlePointerEnter);
-      shell.removeEventListener('pointermove', handlePointerMove);
-      shell.removeEventListener('pointerleave', handlePointerLeave);
-      if (enterTimerRef.current) clearTimeout(enterTimerRef.current);
-      if (leaveRafRef.current) cancelAnimationFrame(leaveRafRef.current);
-      tiltEngine.cancel();
-      shell.classList.remove('entering');
-    };
-  }, [enableTilt, tiltEngine, handlePointerEnter, handlePointerMove, handlePointerLeave]);
-
-  const cardStyle = useMemo(
-    () => ({
-      '--icon': iconUrl ? `url(${iconUrl})` : 'none',
-      '--grain': grainUrl ? `url(${grainUrl})` : 'none',
-      '--inner-gradient': innerGradient ?? DEFAULT_INNER_GRADIENT,
-      '--behind-glow-color': behindGlowColor ?? 'rgba(125, 190, 255, 0.67)',
-      '--behind-glow-size': behindGlowSize ?? '50%'
-    } as React.CSSProperties),
-    [iconUrl, grainUrl, innerGradient, behindGlowColor, behindGlowSize]
-  );
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
-    <div ref={wrapRef} className={`pc-card-wrapper ${className}`.trim()} style={cardStyle}>
-      {behindGlowEnabled && <div className="pc-behind" />}
-      <div ref={shellRef} className="pc-card-shell">
-        <section className="pc-card">
-          <div className="pc-inside">
-            <div className="pc-shine" />
-            <div className="pc-glare" />
-            <div className="pc-content pc-avatar-content">
-              <img
-                className="avatar"
-                src={avatarUrl}
-                alt={`${name || 'User'} avatar`}
-                loading="lazy"
-                onError={(e) => {
-                  const t = e.target as HTMLImageElement;
-                  t.style.display = 'none';
-                }}
-              />
-              {showUserInfo && (
-                <div className="pc-user-info">
-                  <div className="pc-user-details">
-                    <div className="pc-mini-avatar">
-                      <img
-                        src={miniAvatarUrl || avatarUrl}
-                        alt="Mini avatar"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="pc-user-text">
-                      <div className="pc-handle">@{handle}</div>
-                      <div className="pc-status">{status}</div>
-                    </div>
-                  </div>
-                  <button
-                    className="pc-contact-btn"
-                    onClick={onContactClick}
-                    type="button"
-                  >
-                    {contactText}
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="pc-content">
-              <div className="pc-details">
-                <h3>{name}</h3>
-                <p>{title}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </div>
-  );
-};
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        transformStyle: "preserve-3d",
+        transform: enableTilt ? transform : "none",
+      }}
+      className="group relative w-full h-full min-h-[450px] rounded-3xl bg-[#0a0a0a] border border-white/10 overflow-hidden shadow-2xl transition-all duration-500 hover:shadow-[0_0_40px_rgba(124,255,103,0.15)]"
+    >
+      {/* GLOW EFFECT */}
+      <div 
+        className="absolute top-0 left-0 w-full h-full opacity-0 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"
+        style={{ background: `radial-gradient(circle at 50% 50%, ${behindGlowColor}, transparent 70%)` }}
+      />
 
-export default React.memo(ProfileCard);
+      {/* --- FOTO --- */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src={avatarUrl}
+          alt={name}
+          fill
+          priority
+          className="object-cover opacity-90 transition-all duration-700 grayscale group-hover:grayscale-0 group-hover:scale-105"
+        />
+        
+        {/* GRADIENTE */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/90 opacity-90" />
+      </div>
+
+      {/* --- CONTEÚDO --- */}
+      <div 
+        className="absolute inset-0 z-10 flex flex-col justify-between p-6 md:p-8"
+        style={{ transform: "translateZ(20px)" }}
+      >
+        
+        {/* PARTE DE CIMA: APENAS O NOME */}
+        <div className="pt-2 flex justify-between items-start w-full">
+            {/* Nome com tamanho aumentado para destaque */}
+            <h2 className="text-4xl font-bold tracking-tight text-white drop-shadow-md leading-none">
+              {name}
+            </h2>
+
+            {/* Mantive o Status Badge no canto (opcional, se quiseres tirar apaga esta div) */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/10 shadow-lg shrink-0">
+               <span className="relative flex h-2.5 w-2.5">
+                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+               </span>
+               <span className="text-xs font-medium text-white/90">{status}</span>
+            </div>
+        </div>
+
+        {/* PARTE DE BAIXO: BOTÕES */}
+        <div className="flex items-center gap-4">
+           <button 
+             onClick={onContactClick}
+             className="flex-1 bg-white text-black py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#7cff67] transition-colors duration-300"
+           >
+             {contactText} <ArrowUpRight size={18} />
+           </button>
+
+           <div className="flex gap-2">
+              <a href="https://github.com" target="_blank" className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/20 transition-all text-white">
+                <Github size={20} />
+              </a>
+              <a href="https://linkedin.com" target="_blank" className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/20 transition-all text-white">
+                <Linkedin size={20} />
+              </a>
+           </div>
+        </div>
+
+      </div>
+    </motion.div>
+  );
+}

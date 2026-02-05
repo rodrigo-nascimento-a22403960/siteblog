@@ -108,27 +108,7 @@ const projects = [
     color: "from-yellow-600 to-yellow-900",
     visual: <ProjectImage src="/lojaDeisi.png" alt="lojaDeisi" />,
   },
-  {
-    title: "Ready for the next challenge?",
-    description:
-      "I'm eager to apply this engineering mindset to real-world problems. Let's build something impactful together.",
-    tags: ["Available for Hire", "Open to Partnerships"],
-    color: "from-gray-900 to-black border-t border-[#7cff67]/30",
-    visual: (
-      <div className="h-full flex flex-col items-center justify-center text-center p-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#7cff67]/5 to-transparent opacity-50 pointer-events-none" />
-        <Sparkles className="w-10 h-10 text-[#7cff67] mb-4 animate-pulse opacity-70" />
-        <Link
-          href="/contact"
-          className="relative group px-8 py-4 bg-[#7cff67] text-black rounded-full font-bold flex items-center gap-3 text-lg hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(124,255,103,0.4)] hover:shadow-[0_0_35px_rgba(124,255,103,0.6)]"
-        >
-          GET IN TOUCH
-          <ArrowUpRight className="w-6 h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
-        </Link>
-        <p className="text-gray-400 text-sm mt-6 opacity-70">Direct connection to my inbox.</p>
-      </div>
-    ),
-  },
+  
 ];
 
 export default function Projects() {
