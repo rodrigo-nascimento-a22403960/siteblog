@@ -16,9 +16,9 @@ const skillCategories = [
         { name: "Java", file: "iconjava.png" },
         { name: "Kotlin", file: "iconkotlin.png" },
         { name: "C", file: "iconc.png" },
-        { name: "C++", file: "iconcpp.png" },
+        { name: "C++", file: "iconc++.png" },
         { name: "Python", file: "iconpython.png" },
-        { name: "Algorithms", file: "iconalgorithms.png" },
+       
     ]
   },
   {
@@ -29,7 +29,7 @@ const skillCategories = [
         { name: "JavaScript", file: "iconjs.png" },
         { name: "Next.js", file: "iconnext.png" },
         { name: "HTML/CSS", file: "iconhtml.png" },
-        { name: "Tailwind", file: "icontailwind.png" },
+        
     ]
   },
   {
@@ -40,7 +40,7 @@ const skillCategories = [
         { name: "Linux", file: "iconlinux.png" },
         { name: "Docker", file: "icondocker.png" },
         { name: "VS Code", file: "iconvscode.png" },
-        { name: "OOP Design", file: "iconoop.png" },
+        
     ]
   },
   {
