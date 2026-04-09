@@ -68,46 +68,7 @@ const projects = [
     color: "from-blue-600 to-indigo-900",
     visual: <ProjectImage src="/fisica.png" alt="Physics Engine" />,
   },
-  {
-    title: "High-Performance Game",
-    description:
-      "Action game developed in C++ for maximum performance. Features custom rendering loops, manual memory management, and optimized game physics.",
-    tags: ["C++", "Game Dev", "Rendering", "Performance"],
-    color: "from-red-700 to-rose-900",
-    visual: <ProjectImage src="/game.png" alt="C++ Game" />,
-  },
-  {
-    title: "Cinema Management System",
-    description:
-      "Robust Java application for managing movie databases. Implements complex sorting algorithms, search functionality, and object-oriented data persistence.",
-    tags: ["Java", "Data Structures", "Algorithms"],
-    color: "from-amber-600 to-orange-900",
-    visual: <ProjectImage src="/movies.png" alt="Movies App" />,
-  },
-  {
-    title: "AI-Powered Calculator",
-    description:
-      "Intelligent calculator integrated with AI (NLP) to interpret natural language queries and solve complex arithmetic patterns automatically.",
-    tags: ["Python", "AI", "NLP"],
-    color: "from-cyan-600 to-blue-900",
-    visual: <ProjectImage src="/CalculadoraAI.png" alt="CalculadoraAI" maxW={380} />,
-  },
-  {
-    title: "Relational Data System",
-    description:
-      "Comprehensive database architecture designed in SQL. Focus on data normalization (3NF), complex queries, and efficient relationship mapping.",
-    tags: ["SQL", "Database", "Backend"],
-    color: "from-slate-700 to-slate-900",
-    visual: <ProjectImage src="/SQL.png" alt="SQL" />,
-  },
-  {
-    title: "Dynamic API Store",
-    description:
-      "E-commerce frontend built with JavaScript. Consumes external APIs to fetch products dynamically, manage shopping cart state, and process interactions.",
-    tags: ["JavaScript", "REST API", "Frontend"],
-    color: "from-yellow-600 to-yellow-900",
-    visual: <ProjectImage src="/lojaDeisi.png" alt="lojaDeisi" />,
-  },
+  
   
 ];
 
